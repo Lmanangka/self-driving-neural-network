@@ -12,7 +12,7 @@ class car(object):
         self.i2c = smbus.SMBus(1)
 
         self.client = socket.socket()
-        self.client.connect(('ip', port))
+        self.client.connect((ip, port))
         self.conn = self.client.makefile('wb')
 
     def vision(self):
@@ -55,4 +55,18 @@ class car(object):
 
 
 if __name__ == '__main__':
-    
+    addr = '192.168.43.216'
+    p = 1234
+    s = car(addr, p)
+
+    try:
+        thr1 = threading.Thread(target = s.vision)
+        thr2 = threading.Thread(target = s.remote)
+
+        thr1.start()
+        thr2.start()
+
+        thr1.join()
+        thr2.join()
+
+    finally:
