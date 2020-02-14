@@ -16,7 +16,7 @@ class car(object):
         self.conn = self.client.makefile('wb')
 
     def vision(self):
-        with picamera.Picamera() as camera:
+        with picamera.PiCamera() as camera:
             camera.rotation = 180
             camera.resolution = (320, 240)
             camera.framerate = 15
@@ -34,10 +34,8 @@ class car(object):
         self.conn.write(struct.pack('L', 0))
 
     def remote(self):
-        stat = True
-        while stat:
-            msg = self.client.recv(1024).decode()
-
+        msg = self.client.recv(1024).decode()
+        while True:
             if msg == 'w':
                 self.i2c.write_byte(self.address, 0)
 
@@ -52,6 +50,11 @@ class car(object):
 
             elif msg == 'q':
                 self.i2c.write_byte(self.address, 4)
+
+            elif msg == 'e':
+                self.conn.close()
+                self.client.close()
+                break
 
 
 if __name__ == '__main__':
@@ -70,3 +73,5 @@ if __name__ == '__main__':
         thr2.join()
 
     finally:
+        s.conn.close()
+        s.client.close()
