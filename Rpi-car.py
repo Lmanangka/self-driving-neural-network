@@ -17,16 +17,42 @@ class car(object):
 
     def vision(self):
         with picamera.Picamera() as camera:
-            self.camera.rotation = 180
-            self.camera.resolution = (320, 240)
-            self.camera.framerate = 15
-            self.time.sleep(2)
-            self.start = time.time()
-            self.stream = io.BytesIO()
+            camera.rotation = 180
+            camera.resolution = (320, 240)
+            camera.framerate = 15
+            time.sleep(2)
+            start = time.time()
+            stream = io.BytesIO()
 
-        for foo in camera.capture_continuous(stream, 'jpeg', use_video_port = True):
-            self.conn.write(struct.pack('L', stream.tell()))
-            self.conn.flush()
-            self.stream.seek(0)
-            self.conn.write(stream.read())
-            self
+            for foo in camera.capture_continuous(stream, 'jpeg', use_video_port = True):
+                self.conn.write(struct.pack('L', stream.tell()))
+                self.conn.flush()
+                stream.seek(0)
+                self.conn.write(stream.read())
+                stream.seek(0)
+                stream.truncate()
+        self.conn.write(struct.pack('L', 0))
+
+    def remote(self):
+        stat = True
+        while stat:
+            msg = self.client.recv(1024).decode()
+
+            if msg == 'w':
+                self.i2c.write_byte(self.address, 0)
+
+            elif msg == 'a':
+                self.i2c.write_byte(self.address, 1)
+
+            elif msg == 'd':
+                self.i2c.write_byte(self.address, 2)
+
+            elif msg == 's':
+                self.i2c.write_byte(self.address, 3)
+
+            elif msg == 'q':
+                self.i2c.write_byte(self.address, 4)
+
+
+if __name__ == '__main__':
+    
