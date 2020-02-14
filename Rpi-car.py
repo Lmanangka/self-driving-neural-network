@@ -13,11 +13,20 @@ class car(object):
 
         self.client = socket.socket()
         self.client.connect(('ip', port))
-        self.conn.client.makefile('wb')
+        self.conn = self.client.makefile('wb')
 
     def vision(self):
         with picamera.Picamera() as camera:
-            camera.rotation = 180
-            camera.resolution = (320, 240)
-            camera.framerate = 15
-            time.sleep(2)
+            self.camera.rotation = 180
+            self.camera.resolution = (320, 240)
+            self.camera.framerate = 15
+            self.time.sleep(2)
+            self.start = time.time()
+            self.stream = io.BytesIO()
+
+        for foo in camera.capture_continuous(stream, 'jpeg', use_video_port = True):
+            self.conn.write(struct.pack('L', stream.tell()))
+            self.conn.flush()
+            self.stream.seek(0)
+            self.conn.write(stream.read())
+            self
