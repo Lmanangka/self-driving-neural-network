@@ -39,10 +39,10 @@ class car(object):
             if msg == 'w':
                 self.i2c.write_byte(self.address, 0)
 
-            elif msg == 'a':
+            elif msg == 'd':
                 self.i2c.write_byte(self.address, 1)
 
-            elif msg == 'd':
+            elif msg == 'a':
                 self.i2c.write_byte(self.address, 2)
 
             elif msg == 's':
