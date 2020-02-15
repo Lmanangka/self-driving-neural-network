@@ -16,21 +16,21 @@ class collect_data(object):
         print(self.addr)
 
         self.inputSize = inputSize
-        self.inArray = np.zeros(4,4), 'float')
+        self.inArray = np.zeros((4,4), 'float')
         for i in range(4):
             self.inArray[i, i] = 1
 
         self.stat = True
 
         pygame.init()
-        pygame.display.set_mode((240, 240))
+        pygame.display.set_mode((100, 100))
 
     def collect(self):
         savedFrame = 0
         totalFrame = 0
 
         start = cv2.getTickCount()
-        x = np.empty((0, inputSize))
+        x = np.empty((0, self.inputSize))
         y = np.empty((0, 4))
 
         try:
@@ -38,7 +38,7 @@ class collect_data(object):
             frame = 1
 
             while self.stat:
-                stream_bytes = += self.connection.read(1024)
+                stream_bytes += self.connection.read(1024)
                 first = stream_bytes.find(b'\xff\xd8')
                 last = stream_bytes.find(b'\xff\xd9')
 
@@ -59,7 +59,7 @@ class collect_data(object):
 
                     for event in pygame.event.get():
                         if event.type == pygame.KEYDOWN:
-                             input = pygame.key.get_pressed()
+                            input = pygame.key.get_pressed()
 
                             if input[pygame.K_w]:
                                 savedFrame +=1
@@ -89,7 +89,7 @@ class collect_data(object):
                             elif input[pygame.K_x]:
                                 print("exit")
                                 self.conn.sendall(str.encode('e'))
-                                stat = False
+                                self.stat = False
                                 break
 
                         elif event.type == pygame.KEYUP:
@@ -98,7 +98,7 @@ class collect_data(object):
                     if cv2.waitKey(1) & 0xFF == ord('x'):
                         break
 
-            fileName = str(int(time()))
+            fileName = str(int(time.time()))
             directory = "training_data"
             if not os.path.exists(directory):
                 os.makedirs(directory)
@@ -122,9 +122,9 @@ class collect_data(object):
             self.server.close()
 
 if __name__ == '__main__':
-    res = 120 * 320
     ip = '0.0.0.0'
     port = 1234
+    res = 120 * 320
 
     data = collect_data(ip, port, res)
     data.collect()

@@ -13,7 +13,7 @@ class car(object):
 
         self.client = socket.socket()
         self.client.connect((ip, port))
-        self.conn = self.client.makefile('wb')
+        self.com = self.client.makefile('wb')
 
     def vision(self):
         with picamera.PiCamera() as camera:
@@ -25,53 +25,59 @@ class car(object):
             stream = io.BytesIO()
 
             for foo in camera.capture_continuous(stream, 'jpeg', use_video_port = True):
-                self.conn.write(struct.pack('L', stream.tell()))
-                self.conn.flush()
+                self.com.write(struct.pack('L', stream.tell()))
+                self.com.flush()
                 stream.seek(0)
-                self.conn.write(stream.read())
+                self.com.write(stream.read())
                 stream.seek(0)
                 stream.truncate()
-        self.conn.write(struct.pack('L', 0))
+        self.com.write(struct.pack('L', 0))
 
-    def remote(self):
-        msg = self.client.recv(1024).decode()
+    def drive(self):
         while True:
+            msg = self.client.recv(1024).decode()
+
             if msg == 'w':
                 self.i2c.write_byte(self.address, 0)
+                # print("forward")
 
             elif msg == 'd':
                 self.i2c.write_byte(self.address, 1)
+                # print("right")
 
             elif msg == 'a':
                 self.i2c.write_byte(self.address, 2)
+                # print("right")
 
             elif msg == 's':
                 self.i2c.write_byte(self.address, 3)
+                # print("reverse")
 
             elif msg == 'q':
                 self.i2c.write_byte(self.address, 4)
+                # print("stop")
 
             elif msg == 'e':
-                self.conn.close()
-                self.client.close()
                 break
 
+    def run(self):
+        t1 = threading.Thread(target = self.vision)
+        t2 = threading.Thread(target = self.drive)
+        t1.start()
+        t2.start()
+        t1.join()
+        t2.join()
+
+    def disconnect(self):
+        self.com.close()
+        self.client.close()
 
 if __name__ == '__main__':
-    addr = '192.168.43.216'
-    p = 1234
-    s = car(addr, p)
+    ip = '192.168.43.216'
+    port = 1234
+    c = car(ip, port)
 
     try:
-        thr1 = threading.Thread(target = s.vision)
-        thr2 = threading.Thread(target = s.remote)
-
-        thr1.start()
-        thr2.start()
-
-        thr1.join()
-        thr2.join()
-
+        c.run()
     finally:
-        s.conn.close()
-        s.client.close()
+        c.disconnect()
