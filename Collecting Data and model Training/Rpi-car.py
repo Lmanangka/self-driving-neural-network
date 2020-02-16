@@ -5,6 +5,7 @@ import threading
 import io
 import time
 import struct
+import sys
 
 class car(object):
     def __init__(self, ip, port):
@@ -81,3 +82,4 @@ if __name__ == '__main__':
         c.run()
     finally:
         c.disconnect()
+        sys.exit()
