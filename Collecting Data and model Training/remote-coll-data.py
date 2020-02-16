@@ -16,7 +16,7 @@ class collect_data(object):
         print(self.addr)
 
         self.inputSize = inputSize
-        self.inArray = np.zeros((4,4), 'float')
+        self.inArray = np.zeros([4,4], 'float')
         for i in range(4):
             self.inArray[i, i] = 1
 
@@ -30,8 +30,8 @@ class collect_data(object):
         totalFrame = 0
 
         start = cv2.getTickCount()
-        x = np.empty((0, self.inputSize))
-        y = np.empty((0, 4))
+        x = np.empty([0, self.inputSize])
+        y = np.empty([0, 4])
 
         try:
             stream_bytes = b''
@@ -63,22 +63,22 @@ class collect_data(object):
 
                             if input[pygame.K_w]:
                                 savedFrame +=1
-                                x = np.vstack((x, temp_array))
-                                y = np.vstack((y, self.inArray[0]))
+                                x = np.vstack([x, temp_array])
+                                y = np.vstack([y, self.inArray[0]])
                                 self.conn.sendall(str.encode('w'))
                                 print("forward")
 
                             elif input[pygame.K_d]:
                                 savedFrame +=1
-                                x = np.vstack((x, temp_array))
-                                y = np.vstack((y, self.inArray[1]))
+                                x = np.vstack([x, temp_array])
+                                y = np.vstack([y, self.inArray[1]])
                                 self.conn.sendall(str.encode('d'))
                                 print("right")
 
                             elif input[pygame.K_a]:
                                 savedFrame +=1
-                                x = np.vstack((x, temp_array))
-                                y = np.vstack((y, self.inArray[2]))
+                                x = np.vstack([x, temp_array])
+                                y = np.vstack([y, self.inArray[2]])
                                 self.conn.sendall(str.encode('a'))
                                 print("left")
 
