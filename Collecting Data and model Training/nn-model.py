@@ -1,4 +1,5 @@
 import numpy as np
+import keras
 import glob
 import time
 import sys
@@ -30,4 +31,5 @@ class neuralnetwork(object):
         x = x / 255.0
 
     def create(self, layer_sizes):
-        
+        self.model = keras.sequential()
+        self.model.add()
