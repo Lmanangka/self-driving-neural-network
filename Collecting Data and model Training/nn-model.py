@@ -33,3 +33,4 @@ class neuralnetwork(object):
     def create(self, layer_sizes):
         self.model = keras.sequential()
         self.model.add()
+        self.model
