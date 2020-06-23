@@ -1,6 +1,7 @@
+from gpiozero import Motor
 import socket
 import picamera
-import smbus
+# import smbus
 import threading
 import io
 import time
@@ -9,12 +10,15 @@ import sys
 
 class car(object):
     def __init__(self, ip, port):
-        self.address = 0x04
-        self.i2c = smbus.SMBus(1)
+        # self.address = 0x04
+        # self.i2c = smbus.SMBus(1)
 
         self.client = socket.socket()
         self.client.connect((ip, port))
         self.com = self.client.makefile('wb')
+
+        self.motor1 = Motor(forward = 27, backward = 18)
+        self.motor2 = Motor(forward = 24, backward = 10)
 
     def vision(self):
         with picamera.PiCamera() as camera:
@@ -35,27 +39,38 @@ class car(object):
         self.com.write(struct.pack('L', 0))
 
     def drive(self):
+        s = 0.5
         while True:
             msg = self.client.recv(1024).decode()
 
             if msg == 'w':
-                self.i2c.write_byte(self.address, 0)
+                self.motor1.forward(speed = s)
+                self.motor2.forward(speed = s)
+                # self.i2c.write_byte(self.address, 0)
                 # print("forward")
 
             elif msg == 'd':
-                self.i2c.write_byte(self.address, 1)
+                self.motor2.backward(speed = s)
+                self.motor1.forward(speed = s)
+                # self.i2c.write_byte(self.address, 1)
                 # print("right")
 
             elif msg == 'a':
-                self.i2c.write_byte(self.address, 2)
+                self.motor2.forward(speed = s)
+                self.motor1.backward(speed = s)
+                # self.i2c.write_byte(self.address, 2)
                 # print("right")
 
             elif msg == 's':
-                self.i2c.write_byte(self.address, 3)
+                self.motor1.backward(speed = s)
+                self.motor2.backward(speed = s)
+                # self.i2c.write_byte(self.address, 3)
                 # print("reverse")
 
             elif msg == 'q':
-                self.i2c.write_byte(self.address, 4)
+                self.motor1.stop()
+                self.motor2.stop()
+                # self.i2c.write_byte(self.address, 4)
                 # print("stop")
 
             elif msg == 'e':
